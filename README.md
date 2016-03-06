@@ -1,5 +1,5 @@
-Django Storeys Starter
-======================
+Django Starter
+==============
 
-Example / starter project to use Storeys with Django.
+Example / starter project for Django.
 
