@@ -23,21 +23,26 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#%xeb7-rj^*s2ul7zv#5570-yvqqp(vu*g8f3__zo2o3-h%9ay'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DJANGO_RUNTIME_TYPE = os.environ.get('DJANGO_RUNTIME_TYPE', '')
+DEBUG = not DJANGO_RUNTIME_TYPE == 'PRODUCTION'
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
-INSTALLED_APPS = [
+PROJECT_APPS = (
+    'app',
+)
+
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+) + PROJECT_APPS
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,14 +78,21 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+REAL_DB = os.environ.get('REAL_DB', False)
+if not REAL_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(default='mysql://localhost'),
+    }
 
+DATABASE_ENGINE = DATABASES['default']['ENGINE']
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -118,4 +130,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# URL prefix for admin static files -- CSS, JavaScript and images.
+# Make sure to use a trailing slash.
+# Examples: "http://foo.com/static/admin/", "/static/admin/".
+ADMIN_MEDIA_PREFIX = '/static/admin/'
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+STATICFILES_DIRS = [
+]
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
