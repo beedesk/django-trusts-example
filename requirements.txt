@@ -1,7 +1,5 @@
 Django==1.8.12
-Pillow==3.0.0
 argparse==1.2.1
-django-trusts==0.10.2
 docutils==0.12
 funcsigs==1.0.0
 mock==2.0.0

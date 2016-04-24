@@ -1,0 +1,3 @@
+[submodule "submodules/trusts"]
+	path = submodules/trusts
+	url = git@github.com:beedesk/django-trusts.git
