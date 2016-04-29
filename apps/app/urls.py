@@ -17,6 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+import trusts.views
 import views
 
 urlpatterns = [
@@ -25,6 +26,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^projects/(?P<pk>\d+)/$', views.project),
     url(r'^projects/new/$', views.newproject),
+    url(r'^teams/(?P<pk>\d+)/$', trusts.views.team),
+    url(r'^teams/new/$', trusts.views.newteam),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

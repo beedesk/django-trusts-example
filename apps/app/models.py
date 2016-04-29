@@ -19,6 +19,6 @@ class Project(Content, models.Model):
         return self.name
 
     def add_collaborator(self, user):
-        return TrustUserPermission.objects.create(
+        return TrustUserPermission.objects.get_or_create(
             trust=self.trust, entity=user,
             permission=Project.change_permission())

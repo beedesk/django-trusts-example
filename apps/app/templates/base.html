@@ -21,6 +21,10 @@
     </head>
     <body>
         <div class=container-fluid>
+            {% if request.path != '/' %}
+            <br>
+            <a href="/">home</a><br>
+            {% endif %}
             {% block content %}
             <h1>My Projects</h1>
             <p>
@@ -28,7 +32,14 @@
             <a href="{{project.get_absolute_url}}">{{project}}</a><br>
             {% endfor %}
             </p>
-            <a class="btn btn-primary" href="/projects/new/">Add New...</a>
+            <a class="btn btn-success" href="/projects/new/">Add New Project...</a>
+            <h1>My Teams</h1>
+            <p>
+            {% for team in user.groups.all %}
+            <a href="/teams/{{team.pk}}/">{{team}}</a><br>
+            {% endfor %}
+            </p>
+            <a class="btn btn-success" href="/teams/new/">Add New Team...</a>
             {% endblock %}
         </div>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

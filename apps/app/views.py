@@ -28,7 +28,7 @@ def home(request):
     'List projects shared with user'
     projects = Project.objects.filter(trust__trustees__entity=request.user)
     projects |= Project.objects.filter(trust__groups__user=request.user)
-    return render(request, 'home.html', dict(projects=projects))
+    return render(request, 'base.html', dict(projects=projects))
 
 
 class NewProjectView(CreateView):
@@ -40,7 +40,7 @@ class NewProjectView(CreateView):
         r = super(NewProjectView, self).form_valid(form)
         self.object.add_collaborator(self.request.user)
         return r
-newproject = NewProjectView.as_view()
+newproject = login_required(NewProjectView.as_view())
 
 
 class ProjectView(DetailView):

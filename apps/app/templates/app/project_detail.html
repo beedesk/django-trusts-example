@@ -1,28 +1,31 @@
-{% extends "home.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-<a href="/">&lt; back</a>
 <h1>{{object}}</h1>
-<h2>Collaborators:</h2>
-<p>
-{% for t in object.trust.trustees.all %}
-{{t.entity}}<br>
-{% endfor %}
-</p>
-<form method=post>
-    Add collaborator: {{view.adduserform.user}}
-    {% csrf_token %}
-    <input type=submit value=Add>
-</form>
-<h2>Teams:</h2>
-<p>
-{% for g in object.trust.groups.all %}
-{{g}}<br>
-{% endfor %}
-</p>
-<form method=post>
-    Add team: {{view.addgroupform.group}}
-    {% csrf_token %}
-    <input type=submit value=Add>
-</form>
+<div class="panel panel-default">
+    <div class="panel-heading">Teams <a class='pull-right btn btn-xs btn-default' href="/teams/new/">Create new team</a></div>
+    <p class=panel-body>
+    {% for g in object.trust.groups.all %}
+    <a href="/teams/{{g.pk}}/">{{g}}</a><br>
+    {% endfor %}
+    </p>
+    <form class="panel-footer" method=post>
+        Add team: {{view.addgroupform.group}}
+        {% csrf_token %}
+        <input type=submit value=Add>
+    </form>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">Collaborators</div>
+    <p class=panel-body>
+    {% for t in object.trust.trustees.all %}
+    {{t.entity}}<br>
+    {% endfor %}
+    </p>
+    <form class=panel-footer method=post>
+        Add collaborator: {{view.adduserform.user}}
+        {% csrf_token %}
+        <input type=submit value=Add>
+    </form>
+</div>
 {% endblock %}
