@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
+{% block css %}
+    <style>
+        li {
+            list-style: none;
+            text-indent: 10px;
+        }
+        li .username {
+            display: inline-block;
+            width: 200px;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 <h1>{{object}}</h1>
 <div class="panel panel-default">
@@ -19,7 +32,7 @@
     <div class="panel-heading">Collaborators</div>
     <p class=panel-body>
     {% for t in object.trust.trustees.all %}
-    {{t.entity}}<br>
+        <li><span class="username">{{t.entity}}</span> [{{t.permission}}]</li>
     {% endfor %}
     </p>
     <form class=panel-footer method=post>
