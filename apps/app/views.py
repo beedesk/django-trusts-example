@@ -4,8 +4,10 @@ from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView
 
+from trusts.decorators import permission_required, K
+from trusts.models import Trust
+
 from models import Project
-from trusts.decorators import permission_required
 
 
 class ProjectForm(forms.ModelForm):
@@ -26,9 +28,10 @@ class SelectGroupForm(forms.Form):
 @login_required
 def home(request):
     'List projects shared with user'
-    projects = Project.objects.filter(trust__trustees__entity=request.user)
-    projects |= Project.objects.filter(trust__groups__user=request.user)
-    return render(request, 'base.html', dict(projects=projects))
+
+    projects = Project.objects.all().permitted('read_project', request.user)
+    trust = Trust.objects.get_or_create_settlor_default(request.user)
+    return render(request, 'base.html', dict(projects=projects, trust=trust))
 
 
 class NewProjectView(CreateView):
@@ -38,7 +41,8 @@ class NewProjectView(CreateView):
 
     def form_valid(self, form):
         r = super(NewProjectView, self).form_valid(form)
-        self.object.add_collaborator(self.request.user)
+        self.entity = self.request.user
+        self.object.grant('read_project', self.request.user)
         return r
 newproject = login_required(NewProjectView.as_view())
 
@@ -47,7 +51,7 @@ class ProjectView(DetailView):
     'View project, add collaborators, teams'
     model = Project
 
-    def dispatch(self, request, pk):
+    def dispatch(self, request, alias, pk):
         self.adduserform = SelectUserForm(request.POST or None)
         if self.adduserform.is_valid():
             # add project collaborator
@@ -63,5 +67,4 @@ class ProjectView(DetailView):
             return redirect('.')
         return super(ProjectView, self).dispatch(request, pk)
 
-project = permission_required('app.change_project', fieldlookups_kwargs=dict(
-    pk='pk'))(ProjectView.as_view())
+project = permission_required('app.change_project', pk=K('pk'))(ProjectView.as_view())

@@ -1,6 +1,8 @@
 from django.contrib.auth.models import Permission
 from django.db import models
 
+from trusts import ENTITY_MODEL_NAME, PERMISSION_MODEL_NAME, GROUP_MODEL_NAME, \
+                    DEFAULT_SETTLOR, ALLOW_NULL_SETTLOR, ROOT_PK, utils
 from trusts.models import Content, TrustUserPermission
 
 
@@ -13,12 +15,10 @@ class Project(Content, models.Model):
             'change_project', 'app', 'project')
 
     def get_absolute_url(self):
-        return '/projects/%i/' % self.pk
+        return '/projects/%s/%i/' % (self.trust.settlor.username, self.pk)
 
     def __unicode__(self):
         return self.name
 
     def add_collaborator(self, user):
-        return TrustUserPermission.objects.get_or_create(
-            trust=self.trust, entity=user,
-            permission=Project.change_permission())
+        self.grant('change_project', user)

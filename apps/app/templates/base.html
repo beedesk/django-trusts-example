@@ -31,10 +31,10 @@
             <h1>My Projects</h1>
             <p>
             {% for project in projects %}
-            <a href="{{project.get_absolute_url}}">{{project}}</a><br>
+            <a href="{% url 'entities_view' project.trust.settlor.username %}">{{project.trust.settlor.username}}</a> / <a href="{% url 'project_view' project.trust.settlor.username project.pk %}">{{project}}</a><br>
             {% endfor %}
             </p>
-            <a class="btn btn-success" href="/projects/new/">Add New Project...</a>
+            <a class="btn btn-success" href="{% url 'project_create' user.username %}">Add New Project...</a>
             <h1>My Teams</h1>
             <p>
             {% for team in user.groups.all %}
