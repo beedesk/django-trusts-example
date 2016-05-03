@@ -17,11 +17,16 @@
 <h1>{{object}}</h1>
 <div class="panel panel-default">
     <div class="panel-heading">Teams <a class='pull-right btn btn-xs btn-default' href="/teams/new/">Create new team</a></div>
-    <p class=panel-body>
-    {% for g in object.trust.groups.all %}
-    <a href="/teams/{{g.pk}}/">{{g}}</a><br>
-    {% endfor %}
-    </p>
+    <form method=post class=panel-body>
+        {% csrf_token %}
+        {% for g in object.trust.groups.all %}
+        <a href="/teams/{{g.pk}}/">{{g}}</a>
+        <button name="rmgroup" value={{g.pk}} class='btn btn-xs btn-danger'>
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </button>
+        <br>
+        {% endfor %}
+    </form>
     <form class="panel-footer" method=post>
         Add team: {{view.addgroupform.group}}
         {% csrf_token %}
@@ -30,13 +35,20 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">Collaborators</div>
-    <p class=panel-body>
-    {% for t in object.trust.trustees.all %}
-        <li><span class="username">{{t.entity}}</span> [{{t.permission}}]</li>
-    {% endfor %}
-    </p>
+    <form method=post class=panel-body>
+        {% csrf_token %}
+        {% for t in object.trust.trustees.all %}
+        <li><span class="username">{{t.entity}}</span> [{{t.permission}}]
+            <button name="rmuser" value={{t.pk}} class='btn btn-xs btn-danger'>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true">
+                </span>
+            </button>
+        </li>
+        {% endfor %}
+    </form>
     <form class=panel-footer method=post>
         Add collaborator: {{view.adduserform.user}}
+        {{view.adduserform.permission}}
         {% csrf_token %}
         <input type=submit value=Add>
     </form>

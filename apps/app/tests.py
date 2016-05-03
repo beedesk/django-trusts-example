@@ -19,13 +19,14 @@ class MainTest(TestCase):
 
     def test_project(self):
         p = Project.objects.create()
-        p.add_collaborator(self.user)
+        p.add_collaborator('change_project', self.user)
         r = self.client.get(p.get_absolute_url())
         self.assertContains(r, 'html')
         # add collaborator
         u = get_user_model().objects.create(username='b')
         self.assertFalse(u.has_perm('app.change_project', p))
-        r = self.client.post(p.get_absolute_url(), dict(user=u.pk))
+        r = self.client.post(p.get_absolute_url(), dict(
+            user=u.pk, permission='change_project'))
         self.assertRedirects(r, p.get_absolute_url())
         u = get_user_model().objects.get(pk=u.pk)
         self.assertTrue(u.has_perm('app.change_project', p))
@@ -40,9 +41,10 @@ class MainTest(TestCase):
         self.assertTrue(u.has_perm('app.change_project', p))
 
     def test_newproject(self):
-        r = self.client.get(reverse(views.newproject))
+        url = '/projects/x/new/'
+        r = self.client.get(url)
         self.assertContains(r, 'html')
-        r = self.client.post(reverse(views.newproject), dict(name='Test'))
+        r = self.client.post(url, dict(name='Test'))
         p = Project.objects.get()
         self.assertRedirects(r, p.get_absolute_url())
         self.assertTrue(self.user.has_perm('app.change_project', p))

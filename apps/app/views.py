@@ -4,10 +4,9 @@ from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView
 
-from trusts.decorators import permission_required, K
-from trusts.models import Trust
-
 from models import Project
+from trusts.decorators import K, permission_required
+from trusts.models import Trust
 
 
 class ProjectForm(forms.ModelForm):
@@ -17,8 +16,12 @@ class ProjectForm(forms.ModelForm):
         exclude = 'trust',
 
 
-class SelectUserForm(forms.Form):
+class AddCollaboratorForm(forms.Form):
     user = forms.ModelChoiceField(User.objects.all())
+    permission = forms.ChoiceField([
+        ('read_project', 'Read-only'),
+        ('change_project', 'Read/Write'),
+    ])
 
 
 class SelectGroupForm(forms.Form):
@@ -42,7 +45,7 @@ class NewProjectView(CreateView):
     def form_valid(self, form):
         r = super(NewProjectView, self).form_valid(form)
         self.entity = self.request.user
-        self.object.grant('read_project', self.request.user)
+        self.object.grant('change_project', self.request.user)
         return r
 newproject = login_required(NewProjectView.as_view())
 
@@ -52,10 +55,19 @@ class ProjectView(DetailView):
     model = Project
 
     def dispatch(self, request, alias, pk):
-        self.adduserform = SelectUserForm(request.POST or None)
+        rmuser = request.POST.get('rmuser')
+        if rmuser:
+            self.get_object().trust.trustees.filter(pk=rmuser).delete()
+            return redirect('.')
+        rmgroup = request.POST.get('rmgroup')
+        if rmgroup:
+            self.get_object().trust.groups.remove(rmgroup)
+            return redirect('.')
+        self.adduserform = AddCollaboratorForm(request.POST or None)
         if self.adduserform.is_valid():
             # add project collaborator
             self.get_object().add_collaborator(
+                self.adduserform.cleaned_data['permission'],
                 self.adduserform.cleaned_data['user'])
             return redirect('.')
         self.addgroupform = SelectGroupForm(request.POST or None)
@@ -67,4 +79,5 @@ class ProjectView(DetailView):
             return redirect('.')
         return super(ProjectView, self).dispatch(request, pk)
 
-project = permission_required('app.change_project', pk=K('pk'))(ProjectView.as_view())
+project = permission_required('app.change_project', pk=K('pk'))(
+    ProjectView.as_view())

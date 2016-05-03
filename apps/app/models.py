@@ -1,9 +1,7 @@
 from django.contrib.auth.models import Permission
 from django.db import models
 
-from trusts import ENTITY_MODEL_NAME, PERMISSION_MODEL_NAME, GROUP_MODEL_NAME, \
-                    DEFAULT_SETTLOR, ALLOW_NULL_SETTLOR, ROOT_PK, utils
-from trusts.models import Content, TrustUserPermission
+from trusts.models import Content
 
 
 class Project(Content, models.Model):
@@ -20,5 +18,5 @@ class Project(Content, models.Model):
     def __unicode__(self):
         return self.name
 
-    def add_collaborator(self, user):
-        self.grant('change_project', user)
+    def add_collaborator(self, permission, user):
+        self.grant(permission, user)
