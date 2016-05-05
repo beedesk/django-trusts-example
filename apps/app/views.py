@@ -18,10 +18,6 @@ class ProjectForm(forms.ModelForm):
 
 class AddCollaboratorForm(forms.Form):
     user = forms.ModelChoiceField(User.objects.all())
-    permission = forms.ChoiceField([
-        ('read_project', 'Read-only'),
-        ('change_project', 'Read/Write'),
-    ])
 
 
 class SelectGroupForm(forms.Form):
@@ -50,6 +46,14 @@ class NewProjectView(CreateView):
 newproject = login_required(NewProjectView.as_view())
 
 
+class PermissionForm(forms.Form):
+    trustee = forms.CharField(widget=forms.HiddenInput())
+    permission = forms.ChoiceField([
+        ('read_project', 'Read'),
+        ('change_project', 'Write'),
+    ])
+
+
 class ProjectView(DetailView):
     'View project, add collaborators, teams'
     model = Project
@@ -67,7 +71,7 @@ class ProjectView(DetailView):
         if self.adduserform.is_valid():
             # add project collaborator
             self.get_object().add_collaborator(
-                self.adduserform.cleaned_data['permission'],
+                'read_project',
                 self.adduserform.cleaned_data['user'])
             return redirect('.')
         self.addgroupform = SelectGroupForm(request.POST or None)
@@ -77,6 +81,22 @@ class ProjectView(DetailView):
             group.permissions.add(Project.change_permission())
             group.trusts.add(self.get_object().trust)
             return redirect('.')
+        self.trustees = self.get_object().trust.trustees.all()
+        self.formset = forms.formset_factory(PermissionForm, extra=0)(
+            request.POST or None, initial=[dict(
+                trustee=t.pk, permission=t.permission.codename
+            ) for t in self.trustees]
+        )
+        if self.formset.is_valid():
+            for data in self.formset.cleaned_data:
+                trustee = self.trustees.get(pk=data['trustee'])
+                if trustee.permission.codename != data['permission']:
+                    trustee.delete()
+                    self.get_object().add_collaborator(
+                        data['permission'], trustee.entity)
+            return redirect('.')
+        for trustee, form in zip(self.trustees, self.formset):
+            trustee.form = form
         return super(ProjectView, self).dispatch(request, pk)
 
 project = permission_required('app.change_project', pk=K('pk'))(
