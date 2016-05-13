@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{object}}</h1>
+<h1>{{object}} ({{ object.pk}})</h1>
 <div class="panel panel-default">
     <div class="panel-heading">Teams <a class='pull-right btn btn-xs btn-default' href="/teams/new/">Create new team</a></div>
     <form method=post class=panel-body>

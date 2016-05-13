@@ -31,7 +31,7 @@
             <h1>My Projects</h1>
             <p>
             {% for project in projects %}
-            <a href="{% url 'entities_view' project.trust.settlor.username %}">{{project.trust.settlor.username}}</a> / <a href="{% url 'project_view' project.trust.settlor.username project.pk %}">{{project}}</a><br>
+            <a href="{% url 'entities_view' project.trust.settlor.username %}">{{project.trust.settlor.username}}</a> / <a href="{% url 'project_view' project.trust.settlor.username project.pk %}">{{project}} ({{ project.pk }})</a><br>
             {% endfor %}
             </p>
             <a class="btn btn-success" href="{% url 'project_create' user.username %}">Add New Project...</a>

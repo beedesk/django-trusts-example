@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView
 
 from models import Project
-from trusts.decorators import K, permission_required
+from trusts.decorators import P, K, permission_required
 from trusts.models import Trust
 
 
@@ -36,8 +36,8 @@ class PermissionForm(forms.Form):
 def home(request):
     'List projects shared with user'
 
-    projects = Project.objects.all().permitted('read_project', request.user)
-    trust = Trust.objects.get_or_create_settlor_default(request.user)
+    projects = Project.objects.all().permitted('read_project', request.user).distinct()
+    trust, created = Trust.objects.get_or_create_settlor_default(request.user)
     return render(request, 'base.html', dict(projects=projects, trust=trust))
 
 
@@ -49,6 +49,9 @@ class NewProjectView(CreateView):
     def form_valid(self, form):
         r = super(NewProjectView, self).form_valid(form)
         self.entity = self.request.user
+        self.trust, created = Trust.objects.get_or_create_settlor_default(self.request.user)
+        print 'trust: ', self.trust, ' settlor: ', self.trust.settlor
+        self.object.grant('read_project', self.request.user)
         self.object.grant('change_project', self.request.user)
         return r
 newproject = login_required(NewProjectView.as_view())
@@ -122,5 +125,5 @@ class ProjectView(DetailView):
             trustee.form = form
         return super(ProjectView, self).dispatch(request, pk)
 
-project = permission_required('app.change_project', pk=K('pk'))(
+project = permission_required(P('app.read_project', pk=K('pk')) | P('app.change_project', pk=K('pk')))(
     ProjectView.as_view())
