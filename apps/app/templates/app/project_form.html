@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h3>Create a new Project</h3>
+<p>A project contains all files, including the revision history.</p>
+<hr>
 <form method=post>
     {% csrf_token %}
     {{form.as_p}}

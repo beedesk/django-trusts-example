@@ -22,11 +22,15 @@
         {% endblock %}
     </head>
     <body>
-        <div class=container-fluid>
+        <div style="padding: 10px 20px; margin-bottom: 10px; background-color: #EEE;">
+            <span style="float: right;"><a href="/accounts/logout">Logout</a> {{ request.user }}</span>
             {% if request.path != '/' %}
-            <br>
-            <a href="/">home</a><br>
+                <a href="/">Home</a><br>
+            {% else %}
+                Welcome
             {% endif %}
+        </div>
+        <div class=container-fluid>
             {% block content %}
             <h1>My Projects</h1>
             <p>
@@ -34,7 +38,7 @@
             <a href="{% url 'entities_view' project.trust.settlor.username %}">{{project.trust.settlor.username}}</a> / <a href="{% url 'project_view' project.trust.settlor.username project.pk %}">{{project}} ({{ project.pk }})</a><br>
             {% endfor %}
             </p>
-            <a class="btn btn-success" href="{% url 'project_create' user.username %}">Add New Project...</a>
+            <a class="btn btn-success" href="{% url 'project_create' %}">Add New Project...</a>
             <h1>My Teams</h1>
             <p>
             {% for team in user.groups.all %}

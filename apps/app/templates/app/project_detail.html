@@ -24,7 +24,7 @@
         <table class=table>
             {% for g in view.teams %}
             <tr>
-                <td><a href="/teams/{{g.pk}}/">{{g}}</a></td>
+                <td><a href="/teams/{{g.pk}}/">{{g.name}}</a></td>
                 <td>
                     {{g.form.entity}}
                     {{g.form.permission}}
@@ -51,13 +51,13 @@
     <div class="panel-heading">Collaborators</div>
     <form method=post class=panel-body>
         {% csrf_token %}
-        {{view.userformset.management_form}}
-        {{view.teamformset.management_form}}
-        {% for t in view.trustees %}
-        <li><span class="username">{{t.entity}}</span>
-            {{t.form.entity}}
-            {{t.form.permission}}
-            <button name="rmuser" value={{t.pk}} class='btn btn-xs btn-danger'>
+        {{ view.userformset.management_form }}
+        {{ view.teamformset.management_form }}
+        {% for u in view.users %}
+        <li><span class="username">{{u.username}}</span>
+            {{u.form.entity}}
+            {{u.form.permission}}
+            <button name="rmuser" value={{u.pk}} class='btn btn-xs btn-danger'>
                 <span class="glyphicon glyphicon-remove" aria-hidden="true">
                 </span>
             </button>
