@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <style>
+        li {
+            list-style: none;
+            text-indent: 10px;
+        }
+        li .username {
+            display: inline-block;
+            width: 200px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<h3>User or Organization:</h3>
+<h1><bold>{{ alias }}</bold></h1>
+
+This is an entity page. Either represent a User or Organization.
+{% endblock %}

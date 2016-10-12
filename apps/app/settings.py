@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'trusts',
 ) + PROJECT_APPS
 
 MIDDLEWARE_CLASSES = [
@@ -151,3 +152,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'trusts.backends.TrustModelBackend',
+)
+
+TRUSTS_DEFAULT_SETTLOR = 1
+TRUSTS_ALLOW_NULL_SETTLOR = False
